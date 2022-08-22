@@ -73,9 +73,11 @@ export default function Auth() {
                                         <TextField sx={{ mb: 1 }} fullWidth label="username" id="fullWidth" onChange={handleChange("uname")} />
                                         <TextField fullWidth label="password" id="fullWidth" onChange={handleChange("pword")} />
                                         <TextField fullWidth label="confirm password" id="fullWidth" />
+                                        <TextField fullWidth label="first_name" id="fullWidth" onChange={handleChange("first_name")} />
+                                        <TextField fullWidth label="last_name" id="fullWidth" onChange={handleChange("last_name")} />
                                         <TextField fullWidth label="email" id="fullWidth" onChange={handleChange("email")} />
                                         <TextField fullWidth label="phone" id="fullWidth" onChange={handleChange("phone")} />
-                                        <TextField fullWidth label="phone" id="fullWidth" onChange={handleChange("age")} />
+                                        <TextField fullWidth label="age" id="fullWidth" onChange={handleChange("age")} />
                                     </div>
                             }
 
