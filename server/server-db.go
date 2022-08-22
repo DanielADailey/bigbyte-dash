@@ -34,6 +34,47 @@ func (rs *RestServer) addUser(user *db.User) error {
 	return nil
 }
 
+func (rs *RestServer) addDbTask(user *db.Task) error {
+	db, err := rs.connect()
+	if err != nil {
+		fmt.Println("err connecting to db")
+	}
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		tx.Create(user)
+		return tx.Error
+	}); err != nil {
+		return fmt.Errorf("transaction error")
+	}
+	return nil
+}
+
+func (rs *RestServer) getAssignedTasks(uid string) ([]*db.Task, error) {
+	gdb, err := rs.connect()
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to db")
+	}
+	var dbtasks []*db.Task
+	gdb.Find(&dbtasks, fmt.Sprintf("%s = ?", "assigned_to"), uid)
+	if len(dbtasks) == 0 {
+		return nil, fmt.Errorf("not found")
+	}
+	return nil, fmt.Errorf("err")
+}
+
+func (rs *RestServer) getDbTasks() []*db.Task {
+	gdb, err := rs.connect()
+	if err != nil {
+		fmt.Println("err connecting to db")
+	}
+	var tasks []*db.Task
+	gdb.Find(&tasks)
+	if len(tasks) == 0 {
+		fmt.Println("no db users")
+		return nil
+	}
+	return tasks
+}
+
 func (rs *RestServer) getDbUsers() []*db.User {
 	gdb, err := rs.connect()
 	if err != nil {

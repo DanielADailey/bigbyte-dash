@@ -1,9 +1,9 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Box from '@mui/material/Box'
 import { Button, Card, CardContent, TextField, Typography } from "@mui/material";
 import axios from 'axios'
 import { minWidth } from "@mui/system";
-import {AuthContext} from "../services/auth-service";
+import { AuthContext } from "../services/auth-service";
 import SyncLoader from 'react-spinners/SyncLoader'
 import { useNavigate } from "react-router";
 
@@ -11,44 +11,79 @@ export default function Auth() {
     const [username, setUsername] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const [loading, setLoading] = useState<boolean>(false)
+    const [values, setValues] = useState({})
+    const [isRegister, setIsRegister] = useState<boolean>(false)
     let navigate = useNavigate()
 
     const auth = React.useContext(AuthContext);
 
     const handleSubmit = () => {
         setLoading(true)
-        let cp = {uname: username, pword:password}
-        auth.login(cp.uname, cp.pword, ()=>{
+        let cp = { uname: username, pword: password }
+        if (isRegister) {
+            auth.register(values, ()=>{
+                setLoading(false);
+                navigate("/", { replace: true });
+            })
+            return
+        }
+        auth.login(cp.uname, cp.pword, () => {
+            setLoading(false);
             navigate("/", { replace: true });
         })
     }
 
-    return(
-        <div style={{height:'100vh'}}>
+    const handleChange = (prop: any) => (event: any) => {
+        setValues({ ...values, [prop]: event.target.value });
+    };
+
+    const handleRegister =(isReg:boolean) => {
+        setIsRegister(isReg)
+    }
+
+
+    return (
+        <div style={{ height: '100vh' }}>
             <Box
-            sx={{
-                display:'flex',
-                flexDirection:'column',
-                justifyContent:"center",
-                alignItems:"center",
-                minHeight:'100vh',
-                minWidth: '50%'
-            }}>
-                {loading ? 
-                    <SyncLoader/>
-                :
-                <Card sx={{
-                    maxWidth:'50%'
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: '100vh',
+                    minWidth: '50%'
                 }}>
-                    <CardContent>
-                        <Typography variant="h3" style={{ fontFamily: 'Playfair-Display', color: 'black' }} sx={{mb:1}}>Login</Typography>
-                        <TextField sx={{mb:1}} fullWidth label="username" id="fullWidth" onChange={(e)=>{setUsername(e.target.value)}}/>
-                        <TextField fullWidth label="password" id="fullWidth" onChange={(e)=>{setPassword(e.target.value)}}/>
-                        <Button onClick={handleSubmit}>Submit</Button>
-                    </CardContent>  
-                </Card>
+                {loading ?
+                    <SyncLoader />
+                    :
+                    <Card sx={{
+                        maxWidth: '50%'
+                    }}>
+                        <CardContent>
+                            {
+                                !isRegister ?
+                                    <div>
+                                        <Typography variant="h3" style={{ fontFamily: 'Playfair-Display', color: 'black' }} sx={{ mb: 1 }}>Login</Typography>
+                                        <TextField sx={{ mb: 1 }} fullWidth label="username" id="fullWidth" onChange={(e) => { setUsername(e.target.value) }} />
+                                        <TextField fullWidth label="password" id="fullWidth" onChange={(e) => { setPassword(e.target.value) }} />
+                                        <Typography onClick={()=>{handleRegister(true)}}>No account? Click here to register.</Typography>
+                                    </div> :
+                                    <div>
+                                        <Typography variant="h3" style={{ fontFamily: 'Playfair-Display', color: 'black' }} sx={{ mb: 1 }}>Register</Typography>
+                                        <TextField sx={{ mb: 1 }} fullWidth label="username" id="fullWidth" onChange={handleChange("uname")} />
+                                        <TextField fullWidth label="password" id="fullWidth" onChange={handleChange("pword")} />
+                                        <TextField fullWidth label="confirm password" id="fullWidth" />
+                                        <TextField fullWidth label="email" id="fullWidth" onChange={handleChange("email")} />
+                                        <TextField fullWidth label="phone" id="fullWidth" onChange={handleChange("phone")} />
+                                        <TextField fullWidth label="phone" id="fullWidth" onChange={handleChange("age")} />
+                                    </div>
+                            }
+
+                            <Button onClick={handleSubmit}>Submit</Button>
+                        </CardContent>
+                    </Card>
                 }
-                
+
             </Box>
         </div>
     )

@@ -5,11 +5,13 @@
 import React, { createContext, FC, useState } from "react";
 
 const API_URL = "http://localhost:3001/auth"
+const REGISTER_URL = "http://localhost:3001/user"
  
  interface AuthContextType {
    uid:number;
    login: (uname: string, pword: string, cb:VoidFunction) => void
    logout: () => void
+   register:(obj:any, cb:VoidFunction) => void
   }
   
   export const AuthContext = createContext<AuthContextType>(
@@ -27,7 +29,11 @@ const API_URL = "http://localhost:3001/auth"
       setUid(0)
       return authProviderService.logout
     }
-    let value = {uid, login, logout}
+    let register = (obj:any, cb:VoidFunction) => {
+      setUid(1)
+      return authProviderService.register(obj, cb)
+    }
+    let value = {uid, login, logout, register}
     return (<AuthContext.Provider value={value}>{children}</AuthContext.Provider>)
  }
 
@@ -44,6 +50,15 @@ const API_URL = "http://localhost:3001/auth"
   },
   logout(){
     console.log("logout")
+  },
+  register(obj:any, cb:VoidFunction){
+    console.log(obj)
+    axios.post(REGISTER_URL, obj).then(res => {
+      console.log(res)
+      cb()
+    }).catch(err => {
+      console.log(err)
+    })
   }
  }
 

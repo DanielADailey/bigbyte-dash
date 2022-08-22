@@ -7,6 +7,8 @@ import (
 
 	"github.com/ddailey/bigbyte-dash/db"
 	"github.com/ddailey/bigbyte-dash/server/auth"
+	"github.com/go-chi/chi/v5"
+	"github.com/lib/pq"
 )
 
 type AuthPacket struct {
@@ -22,6 +24,18 @@ type RegistrationPacket struct {
 	Email     string `json:"email"`
 	Age       string `json:"age"`
 	Phone     string `json:"phone"`
+}
+
+type TaskPacket struct {
+	Title           string        `json:"title"`
+	TaskDescription string        `json:"task_description"`
+	StartTime       int64         `json:"start_time"`
+	EndTime         int64         `json:"end_time"`
+	Status          int           `json:"status"`
+	GroupId         string        `json:"group_id"`
+	CreatedBy       string        `json:"created_by"`
+	AssignedTo      string        `json:"assigned_to"`
+	Comments        pq.Int64Array `json:"offsets;type:integer[]"`
 }
 
 func (rs *RestServer) authUser(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +105,30 @@ func (rs *RestServer) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(buf)
+}
+
+func (rs *RestServer) addTask(w http.ResponseWriter, r *http.Request) {
+	taskObject := &TaskPacket{}
+	if err := json.NewDecoder(r.Body).Decode(&taskObject); err != nil {
+		w.Write([]byte("Error decoding post body"))
+		return
+	}
+
+}
+
+func (rs *RestServer) getTasksByUID(w http.ResponseWriter, r *http.Request) {
+	uid := chi.URLParam(r, "uid")
+	user, err := rs.getDbUserByColumn("id", uid, false)
+	if err != nil {
+		return
+	}
+	if user == nil {
+		return
+	}
+	tasks := make([]string, 0)
+	for _, task := range user.AssignedTasks {
+		tasks = append(tasks, task)
+	}
 }
 
 func (rs *RestServer) deleteUser(w http.ResponseWriter, r *http.Request) {
