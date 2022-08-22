@@ -7,8 +7,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/jwtauth/v5"
 	"gorm.io/gorm"
 )
+
+var tokenAuth *jwtauth.JWTAuth
 
 type RestServer struct {
 	sub   *chi.Mux
@@ -21,6 +24,7 @@ const (
 	AuthEndpoint     = "/auth"
 	UsersEndpoint    = "/user"
 	RegisterEndpoint = "/register"
+	AdminEndpoint    = "/admin"
 )
 
 var rs = &RestServer{}
@@ -50,6 +54,7 @@ func (rs *RestServer) group(base string, middleware func(next http.Handler) http
 			r.Mount(base, sub)
 		}
 		if middleware != nil {
+			sub.Use(jwtauth.Verifier(tokenAuth))
 			sub.Use(middleware)
 		}
 		route(sub)
@@ -58,6 +63,10 @@ func (rs *RestServer) group(base string, middleware func(next http.Handler) http
 
 func (rs *RestServer) Public(base string, route func(r chi.Router)) {
 	rs.group(base, nil, route)
+}
+
+func (rs *RestServer) Token(base string, route func(r chi.Router)) {
+	rs.group(base, jwtauth.Authenticator, route)
 }
 
 func (rs *RestServer) Run() {
@@ -80,6 +89,8 @@ func (rs *RestServer) Run() {
 	})
 	rs.Public(UsersEndpoint, func(r chi.Router) {
 		r.Post("/", rs.registerUser)
+	})
+	rs.Token(AdminEndpoint, func(r chi.Router) {
 		r.Post("/{id}", rs.updateUser)
 		r.Delete("/{id}", rs.deleteUser)
 		r.Get("/", rs.getUsers)

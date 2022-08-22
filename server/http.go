@@ -41,7 +41,14 @@ func (rs *RestServer) authUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("OK"))
+	atCookie := auth.GenJWT(pkt.Username)
+	if atCookie == nil {
+		return
+	}
+
+	http.SetCookie(w, atCookie)
+	w.WriteHeader(200)
+	w.Write([]byte("OK, cookie?"))
 }
 
 func (rs *RestServer) registerUser(w http.ResponseWriter, r *http.Request) {
