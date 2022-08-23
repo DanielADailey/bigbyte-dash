@@ -61,7 +61,3 @@ const REGISTER_URL = "http://localhost:3001/user"
     })
   }
  }
-
- function useAuth() {
-  return React.useContext(AuthContext);
-}

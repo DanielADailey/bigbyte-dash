@@ -14,22 +14,34 @@ import Auth from './components/auth/Auth'
 import DashboardDrawerLayout from './components/dash/DashboardDrawerLayout';
 import {AuthProvider} from './components/services/auth-service';
 import {AuthContext} from './components/services/auth-service';
+import Home from './components/home/Home';
+import AddGame from './components/dash/games/AddGame';
 
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
-          <Route path="/login" element={<Auth />} />
+      <Route path="/" element={<Home />} />
+          <Route path="login" element={<Auth />} />
           <Route
-            path="/"
+            path="v1/*"
             element={
               <RequireAuth>
                 <DashboardDrawerLayout />
               </RequireAuth>
             }
           />
+          <Route path="*" element={<PageNotFound/>}/>
       </Routes>
     </AuthProvider>
+  );
+}
+
+function PageNotFound() {
+  return (
+    <div>
+      <h2>404 Page not found</h2>
+    </div>
   );
 }
 

@@ -15,15 +15,39 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import DashboardAppBar from './DashboardAppBar'
 import DashboardMainContentArea from './DashboardMainContentArea';
+import { useNavigate } from 'react-router';
 
 const drawerWidth = 240;
 
 export default function DashboardDrawerLayout() {
+
+  const DrawerRoutes = [
+    {
+      human_readable: "Browse Games",
+      nav_route: ""
+    },
+    {
+      human_readable: "Add Game",
+      nav_route: "games/add"
+    },
+    {
+      human_readable: "Profile",
+      nav_route: "profile"
+    }
+  ]
+
+  const nav = useNavigate()
+
+  const handleDrawerClick = (route:any) => {
+    console.log(route)
+    nav(route, {replace:false})
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <DashboardAppBar drawerWidth={drawerWidth}/>
-    
+      <DashboardAppBar drawerWidth={drawerWidth} />
+
       <Drawer
         sx={{
           width: drawerWidth,
@@ -39,36 +63,24 @@ export default function DashboardDrawerLayout() {
         <Toolbar />
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
+          {DrawerRoutes.map((route, index) => (
+            <ListItem key={route.human_readable} disablePadding>
+              <ListItemButton onClick={()=>handleDrawerClick(route.nav_route)}>
                 <ListItemIcon>
                   {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                 </ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText primary={route.human_readable} />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
         <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
       </Drawer>
       <Box
         component="main"
         sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
       >
-        <Toolbar/>
+        <Toolbar />
         <DashboardMainContentArea/>
       </Box>
     </Box>

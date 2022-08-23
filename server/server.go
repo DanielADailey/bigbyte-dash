@@ -26,6 +26,7 @@ const (
 	RegisterEndpoint = "/register"
 	AdminEndpoint    = "/admin"
 	TasksEndpoint    = "/tasks"
+	GamesEndpoint    = "/games"
 )
 
 var rs = &RestServer{}
@@ -96,9 +97,9 @@ func (rs *RestServer) Run() {
 		r.Delete("/{id}", rs.deleteUser)
 		r.Get("/", rs.getUsers)
 	})
-	rs.Public(TasksEndpoint, func(r chi.Router) {
-		r.Post("/create", rs.addTask)
-		r.Get("/{uid}", rs.getTasksByUID)
+	rs.Public(GamesEndpoint, func(r chi.Router) {
+		r.Get("/", rs.getGames)
+		r.Post("/", rs.addGame)
 	})
 	http.ListenAndServe(":3001", rs.sub)
 }

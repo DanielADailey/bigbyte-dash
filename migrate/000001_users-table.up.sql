@@ -8,6 +8,7 @@ CREATE TABLE users (
   last_name VARCHAR(255) NOT NULL DEFAULT '',
   phone_number VARCHAR(255) NOT NULL DEFAULT '',
   assigned_tasks VARCHAR(2048) NOT NULL DEFAULT '',
+  liked_games VARCHAR(2048) NOT NULL DEFAULT '',
   permission_level INT NOT NULL DEFAULT 0,
   age INT NOT NULL, 
   
