@@ -99,6 +99,7 @@ func (rs *RestServer) Run() {
 	})
 	rs.Public(GamesEndpoint, func(r chi.Router) {
 		r.Get("/", rs.getGames)
+		r.Get("/{id}", rs.getGameById)
 		r.Post("/", rs.addGame)
 	})
 	http.ListenAndServe(":3001", rs.sub)

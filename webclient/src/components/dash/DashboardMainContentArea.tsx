@@ -22,17 +22,8 @@ export default function DashboardMainContentArea(){
     }
     return(
         <div style={{minWidth:'100%'}}>
-            <Box sx={{
-                flexGrow:1,
-                display:'flex',
-                direction: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                m:0,
-                p:0
-            }}>
-            <Card sx={{flexGrow:1, m:0,p:0}}>
-                <CardContent>
+            <Card sx={{flexGrow:1, m:0,p:0, alignContent:'center', justifyContent:'center', alignItems:'center'}}>
+                <CardContent sx={{flexGrow:1, m:0,p:0, alignContent:'center', justifyContent:'center', alignItems:'center'}}>
                 <Routes>
                     <Route path="/" element={<GameBrowser/>}/>
                     <Route path="/games/add" element={<AddGame/>}/>
@@ -41,7 +32,6 @@ export default function DashboardMainContentArea(){
                 </Routes>
                 </CardContent>
             </Card>
-            </Box>
         </div>
     )
 }

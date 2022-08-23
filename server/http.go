@@ -8,6 +8,7 @@ import (
 
 	"github.com/ddailey/bigbyte-dash/db"
 	"github.com/ddailey/bigbyte-dash/server/auth"
+	"github.com/go-chi/chi/v5"
 	"github.com/lib/pq"
 )
 
@@ -167,6 +168,20 @@ func (rs *RestServer) getUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(buf)
+}
+
+func (rs *RestServer) getGameById(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id != "" {
+		game := rs.getGameByID(id)
+		if game != nil {
+			buf, err := json.Marshal(game)
+			if err != nil {
+				w.Write([]byte(err.Error()))
+			}
+			w.Write(buf)
+		}
+	}
 }
 
 func (rs *RestServer) testEndpoint(w http.ResponseWriter, r *http.Request) {

@@ -118,6 +118,34 @@ func (rs *RestServer) getDbUsers() []*db.User {
 	return users
 }
 
+func (rs *RestServer) getDbGameByColumn(col, val string, delete bool) (*db.Game, error) {
+	gdb, err := rs.connect()
+	if err != nil {
+		fmt.Println("err connecting to db")
+	}
+	var game *db.Game
+	gdb.First(&game, fmt.Sprintf("%s = ?", col), val)
+	if game.Title == "" {
+		return nil, fmt.Errorf("not found")
+	}
+	if delete {
+		gdb.Delete(&game)
+		return nil, nil
+	}
+	return game, nil
+}
+
+func (rs *RestServer) getGameByID(id string) *db.Game {
+	game, err := rs.getDbGameByColumn("id", id, false)
+	if err != nil {
+		return nil
+	}
+	if game != nil {
+		return game
+	}
+	return nil
+}
+
 func (rs *RestServer) getDbUserByColumn(col, val string, delete bool) (*db.User, error) {
 	gdb, err := rs.connect()
 	if err != nil {

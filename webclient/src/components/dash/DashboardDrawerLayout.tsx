@@ -16,6 +16,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import DashboardAppBar from './DashboardAppBar'
 import DashboardMainContentArea from './DashboardMainContentArea';
 import { useNavigate } from 'react-router';
+import { display } from '@mui/system';
 
 const drawerWidth = 240;
 
@@ -46,7 +47,7 @@ export default function DashboardDrawerLayout() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <DashboardAppBar drawerWidth={drawerWidth} />
+      <DashboardAppBar drawerWidth={drawerWidth}/>
 
       <Drawer
         sx={{
@@ -56,11 +57,13 @@ export default function DashboardDrawerLayout() {
             width: drawerWidth,
             boxSizing: 'border-box',
           },
+          textAlign:'center'
         }}
         variant="permanent"
         anchor="left"
       >
-        <Toolbar />
+        <Toolbar/>
+        <Typography variant="h4" style={{ fontFamily: 'Montserrat', color: 'white' }} sx={{ mb: 1 }}>Gamertäg</Typography>
         <Divider />
         <List>
           {DrawerRoutes.map((route, index) => (
@@ -78,7 +81,7 @@ export default function DashboardDrawerLayout() {
       </Drawer>
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+        sx={{flexGrow:1, m:0,p:0, alignContent:'center', justifyContent:'center', alignItems:'center'}}
       >
         <Toolbar />
         <DashboardMainContentArea/>
