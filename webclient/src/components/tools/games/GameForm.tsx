@@ -20,7 +20,6 @@ export default function GameForm(): JSX.Element {
         })
 
     }
-
     const handleChange = (prop: any) => (event: any) => {
         setValues({ ...values, [prop]: event.target.value });
     };

@@ -15,6 +15,7 @@ import AddGame from "./games/AddGame";
 import Profile from "../profile/Profile";
 import ExpandedGameView from "./games/ExpandedGameView";
 import GameBrowser from "./games/GameBrowser";
+import TasksList from "../tasks/TasksList";
 export default function DashboardMainContentArea(){
     const nav = useNavigate()
     const navToSubroute = () => {
@@ -29,6 +30,7 @@ export default function DashboardMainContentArea(){
                     <Route path="/games/add" element={<AddGame/>}/>
                     <Route path="/games/view/:id" element={<ExpandedGameView />} />
                     <Route path="/profile/:id" element={<Profile/>}/>
+                    <Route path="/tasks" element={<TasksList/>}/>
                 </Routes>
                 </CardContent>
             </Card>

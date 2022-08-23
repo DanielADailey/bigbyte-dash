@@ -184,6 +184,34 @@ func (rs *RestServer) getGameById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (rs *RestServer) getTasks(w http.ResponseWriter, r *http.Request) {
+	tasks := rs.getDbTasks()
+	if len(tasks) > 0 {
+		buf, err := json.Marshal(tasks)
+		if err != nil {
+			return
+		}
+		w.Write(buf)
+	}
+}
+
+func (rs RestServer) getUserById(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id != "" {
+		user, err := rs.getDbUserByColumn("id", id, false)
+		if err != nil {
+			return
+		}
+		if user != nil {
+			buf, err := json.Marshal(user)
+			if err != nil {
+				w.Write([]byte(err.Error()))
+			}
+			w.Write(buf)
+		}
+	}
+}
+
 func (rs *RestServer) testEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }

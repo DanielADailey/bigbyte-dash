@@ -91,6 +91,7 @@ func (rs *RestServer) Run() {
 	})
 	rs.Public(UsersEndpoint, func(r chi.Router) {
 		r.Post("/", rs.registerUser)
+		r.Get("/{id}", rs.getUserById)
 	})
 	rs.Token(AdminEndpoint, func(r chi.Router) {
 		r.Post("/{id}", rs.updateUser)
@@ -101,6 +102,9 @@ func (rs *RestServer) Run() {
 		r.Get("/", rs.getGames)
 		r.Get("/{id}", rs.getGameById)
 		r.Post("/", rs.addGame)
+	})
+	rs.Public(TasksEndpoint, func(r chi.Router) {
+		r.Get("/", rs.getTasks)
 	})
 	http.ListenAndServe(":3001", rs.sub)
 }

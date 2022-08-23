@@ -2,7 +2,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
@@ -16,7 +15,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import DashboardAppBar from './DashboardAppBar'
 import DashboardMainContentArea from './DashboardMainContentArea';
 import { useNavigate } from 'react-router';
-import { display } from '@mui/system';
+import { AuthContext } from '../services/auth-service';
 
 const drawerWidth = 240;
 
@@ -32,15 +31,24 @@ export default function DashboardDrawerLayout() {
       nav_route: "games/add"
     },
     {
+      human_readable: "Tasks",
+      nav_route: "tasks/"
+    },
+    {
       human_readable: "Profile",
-      nav_route: "profile"
+      nav_route: "profile/"
     }
   ]
 
   const nav = useNavigate()
+  const auth = React.useContext(AuthContext)
 
   const handleDrawerClick = (route:any) => {
     console.log(route)
+    if (route == "profile/"){
+      nav(route + auth.uid, {replace:false})
+      return
+    }
     nav(route, {replace:false})
   }
 
@@ -48,7 +56,6 @@ export default function DashboardDrawerLayout() {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <DashboardAppBar drawerWidth={drawerWidth}/>
-
       <Drawer
         sx={{
           width: drawerWidth,
@@ -60,8 +67,7 @@ export default function DashboardDrawerLayout() {
           textAlign:'center'
         }}
         variant="permanent"
-        anchor="left"
-      >
+        anchor="left">
         <Toolbar/>
         <Typography variant="h4" style={{ fontFamily: 'Montserrat', color: 'white' }} sx={{ mb: 1 }}>Gamertäg</Typography>
         <Divider />
@@ -81,8 +87,7 @@ export default function DashboardDrawerLayout() {
       </Drawer>
       <Box
         component="main"
-        sx={{flexGrow:1, m:0,p:0, alignContent:'center', justifyContent:'center', alignItems:'center'}}
-      >
+        sx={{flexGrow:1, m:0,p:0, alignContent:'center', justifyContent:'center', alignItems:'center'}}>
         <Toolbar />
         <DashboardMainContentArea/>
       </Box>

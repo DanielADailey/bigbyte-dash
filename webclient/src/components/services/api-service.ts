@@ -8,7 +8,7 @@ export const Getter = (route:string, cb:(data:any)=>void) => {
         cb(res.data)
 
     }).catch(err => {
-
+        console.log(err)
     })
 }
 
@@ -17,6 +17,6 @@ export const genericPost = (route:string, obj:any, cb:()=>void) => {
         console.log(res.data)
         cb()
     }).catch(err => {
-
+        console.log(err)
     })
 }
