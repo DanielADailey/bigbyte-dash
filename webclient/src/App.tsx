@@ -1,6 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 import {
   Routes,
   Route,
@@ -49,7 +47,7 @@ function useAuth() {
 function RequireAuth({ children }: { children: JSX.Element }) {
   let auth = useAuth();
   let location = useLocation();
-  if (auth.uid == 0) {
+  if (auth.uid === 0) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

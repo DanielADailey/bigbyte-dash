@@ -1,8 +1,8 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -11,8 +11,8 @@ import (
 )
 
 type RestServer struct {
-	sub           *chi.Mux
-	mutex         *sync.Mutex
+	sub *chi.Mux
+	// mutex         *sync.Mutex
 	tokenList     map[string]*TokenPacket
 	lastCleanTime time.Time
 }
@@ -23,7 +23,6 @@ const (
 	RegisterEndpoint = "/register"
 	AdminEndpoint    = "/admin"
 	TasksEndpoint    = "/tasks"
-	GamesEndpoint    = "/games"
 	LoginEndpoint    = "/login"
 )
 
@@ -67,11 +66,16 @@ func (rs *RestServer) Token(base string, route func(r chi.Router)) {
 // BasicAuth implements a simple middleware handler for adding basic http auth to a route.
 func (rs *RestServer) basicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if len(r.Cookies()) > 0 {
-			token := r.Cookies()[0].Value
-			if rs.tokenList[token].Valid {
-				next.ServeHTTP(w, r)
-				return
+		if r.Cookies() != nil {
+			if len(r.Cookies()) > 0 {
+				token := r.Cookies()[0].Value
+				_, ok := rs.tokenList[token]
+				if ok {
+					if rs.tokenList[token].Valid {
+						next.ServeHTTP(w, r)
+						return
+					}
+				}
 			}
 		}
 		w.Header().Set("WWW-Authenticate", `xBasic realm="restricted", charset="UTF-8"`)
@@ -93,12 +97,10 @@ func (rs *RestServer) Run() {
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
-	rs.sub.Get("/", rs.testEndpoint)
 	rs.Token(AuthEndpoint, func(r chi.Router) {
 		r.Get("/", rs.authUser)
 	})
 	rs.Public(UsersEndpoint, func(r chi.Router) {
-		r.Post("/", rs.registerUser)
 		r.Get("/{id}", rs.getUserById)
 	})
 	rs.Public(AdminEndpoint, func(r chi.Router) {
@@ -106,18 +108,18 @@ func (rs *RestServer) Run() {
 		r.Delete("/{id}", rs.deleteUser)
 		r.Get("/", rs.getUsers)
 	})
-	rs.Public(GamesEndpoint, func(r chi.Router) {
-		r.Get("/", rs.getGames)
-		r.Get("/{id}", rs.getGameById)
-		r.Post("/", rs.addGame)
+	rs.Token(TasksEndpoint, func(r chi.Router) {
+		r.Get("/", rs.getTasks)
+		r.Post("/", rs.addTask)
+	})
+	rs.Public(RegisterEndpoint, func(r chi.Router) {
+		r.Post("/", rs.registerUser)
 	})
 	rs.Public(LoginEndpoint, func(r chi.Router) {
 		r.Post("/", rs.login)
 	})
-	rs.Token(TasksEndpoint, func(r chi.Router) {
-		r.Get("/", rs.getTasks)
-	})
 	go rs.monitorTokens()
+	fmt.Println("Running...")
 	http.ListenAndServe(":3001", rs.sub)
 }
 

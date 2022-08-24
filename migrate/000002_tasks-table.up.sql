@@ -6,11 +6,11 @@ CREATE TABLE tasks (
   start_time BIGINT NOT NULL, 
   end_time BIGINT NOT NULL, 
   status INT NOT NULL, 
+  priority INT NOT NULL,
   group_id VARCHAR(255) NOT NULL DEFAULT '',
-  avatar_location VARCHAR(255) NOT NULL DEFAULT '',
-  created_by VARCHAR(255) NOT NULL DEFAULT '',
-  assigned_to VARCHAR(255) NOT NULL DEFAULT '',
-  comments VARCHAR(255) NOT NULL DEFAULT '', 
+  created_by INT NOT NULL DEFAULT 0,
+  assigned_to INT NOT NULL DEFAULT 0,
+  comments VARCHAR(4096) NOT NULL DEFAULT '', 
   
 
   updated_at timestamp NULL DEFAULT NULL,

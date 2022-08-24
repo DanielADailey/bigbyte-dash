@@ -7,11 +7,11 @@ import { useNavigate } from "react-router";
 
 const API_URL = "http://localhost:3001/login"
 const AUTH_URL = "http://localhost:3001/auth"
-const REGISTER_URL = "http://localhost:3001/user"
+const REGISTER_URL = "http://localhost:3001/register"
  
  interface AuthContextType {
    uid:number;
-   login: (uname: string, pword: string, cb:(uid:any)=>void) => void
+   login: (cp:any, cb:(uid:any)=>void) => void
    logout: () => void
    register:(obj:any, cb:VoidFunction) => void
   }
@@ -34,9 +34,8 @@ const REGISTER_URL = "http://localhost:3001/user"
         console.log(err)
       })
     }
-    let login = (uname: string, password: string, cb:(uid:any)=>void) => {
-      let pkt = {"uname":uname, "pword":password}
-      axios.post(API_URL, pkt, { withCredentials: true }).then(res => {
+    let login = (cp:any, cb:(uid:any)=>void) => {
+      axios.post(API_URL, cp, { withCredentials: true }).then(res => {
         if(res.data.id){
           setUid(res.data.id)
           cb(res.data)

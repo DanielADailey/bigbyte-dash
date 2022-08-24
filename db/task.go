@@ -13,8 +13,9 @@ type Task struct {
 	StartTime       int64          `gorm:"column:start_time"`
 	EndTime         int64          `gorm:"column:end_time"`
 	Status          int            `gorm:"column:status"`
+	Priority        int            `gorm:"column:priority"`
+	CreatedBy       int            `gorm:"column:created_by"`
+	AssignedTo      int            `gorm:"column:assigned_to"`
 	GroupId         string         `gorm:"column:group_id"`
-	CreatedBy       string         `gorm:"column:created_by"`
-	AssignedTo      string         `gorm:"column:assigned_to"`
 	Comments        pq.StringArray `gorm:"column:offsets;type:string[]"`
 }

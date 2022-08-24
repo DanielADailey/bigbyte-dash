@@ -1,5 +1,8 @@
 
 PROJECT=bigbyte-dash
+VERSION=v0.0.1
+
+PROJECT := $(addsuffix -$(VERSION),$(PROJECT))
 
 tidy:
 	-@echo tidy
@@ -10,6 +13,7 @@ update:
 	-@go get -u
 
 server: tidy update
+	-@rm dist/*
 	-@echo build to ./dist/$(PROJECT)
 	-@go mod vendor
 	-@go build -tags static -o ./dist/$(PROJECT)
