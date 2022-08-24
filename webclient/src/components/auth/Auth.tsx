@@ -27,7 +27,7 @@ export default function Auth() {
             })
             return
         }
-        auth.login(cp.uname, cp.pword, (uid) => {
+        auth.login(cp, (uid) => {
             setLoading(false);
             document.cookie = "token="+uid.token
             if (uid.id != 0){
