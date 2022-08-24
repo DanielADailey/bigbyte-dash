@@ -3,21 +3,18 @@ package server
 import (
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/go-chi/jwtauth/v5"
-	"gorm.io/gorm"
 )
 
-var tokenAuth *jwtauth.JWTAuth
-
 type RestServer struct {
-	sub   *chi.Mux
-	mutex *sync.Mutex
-	once  *sync.Once
-	db    *gorm.DB
+	sub           *chi.Mux
+	mutex         *sync.Mutex
+	tokenList     map[string]*TokenPacket
+	lastCleanTime time.Time
 }
 
 const (
@@ -27,15 +24,12 @@ const (
 	AdminEndpoint    = "/admin"
 	TasksEndpoint    = "/tasks"
 	GamesEndpoint    = "/games"
+	LoginEndpoint    = "/login"
 )
 
 var rs = &RestServer{}
 
 func Init() *RestServer {
-	// rs.once.Do(func() {
-
-	// })
-
 	return rs
 }
 
@@ -56,7 +50,6 @@ func (rs *RestServer) group(base string, middleware func(next http.Handler) http
 			r.Mount(base, sub)
 		}
 		if middleware != nil {
-			sub.Use(jwtauth.Verifier(tokenAuth))
 			sub.Use(middleware)
 		}
 		route(sub)
@@ -68,32 +61,47 @@ func (rs *RestServer) Public(base string, route func(r chi.Router)) {
 }
 
 func (rs *RestServer) Token(base string, route func(r chi.Router)) {
-	rs.group(base, jwtauth.Authenticator, route)
+	rs.group(base, rs.basicAuth, route)
+}
+
+// BasicAuth implements a simple middleware handler for adding basic http auth to a route.
+func (rs *RestServer) basicAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if len(r.Cookies()) > 0 {
+			token := r.Cookies()[0].Value
+			if rs.tokenList[token].Valid {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		w.Header().Set("WWW-Authenticate", `xBasic realm="restricted", charset="UTF-8"`)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	})
 }
 
 func (rs *RestServer) Run() {
+	rs.tokenList = make(map[string]*TokenPacket)
+	rs.lastCleanTime = time.Now()
 	rs.sub = chi.NewRouter()
 	rs.sub.Use(middleware.Logger)
+	rs.sub.Use()
 	rs.sub.Use(cors.Handler(cors.Options{
-		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://*", "http://*"},
-		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
+		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 	rs.sub.Get("/", rs.testEndpoint)
-	rs.Public(AuthEndpoint, func(r chi.Router) {
-		r.Get("/", rs.testEndpoint)
-		r.Post("/", rs.authUser)
+	rs.Token(AuthEndpoint, func(r chi.Router) {
+		r.Get("/", rs.authUser)
 	})
 	rs.Public(UsersEndpoint, func(r chi.Router) {
 		r.Post("/", rs.registerUser)
 		r.Get("/{id}", rs.getUserById)
 	})
-	rs.Token(AdminEndpoint, func(r chi.Router) {
+	rs.Public(AdminEndpoint, func(r chi.Router) {
 		r.Post("/{id}", rs.updateUser)
 		r.Delete("/{id}", rs.deleteUser)
 		r.Get("/", rs.getUsers)
@@ -103,8 +111,35 @@ func (rs *RestServer) Run() {
 		r.Get("/{id}", rs.getGameById)
 		r.Post("/", rs.addGame)
 	})
-	rs.Public(TasksEndpoint, func(r chi.Router) {
+	rs.Public(LoginEndpoint, func(r chi.Router) {
+		r.Post("/", rs.login)
+	})
+	rs.Token(TasksEndpoint, func(r chi.Router) {
 		r.Get("/", rs.getTasks)
 	})
+	go rs.monitorTokens()
 	http.ListenAndServe(":3001", rs.sub)
+}
+
+func (rs *RestServer) monitorTokens() {
+	for {
+		// rs.mutex.Lock()
+		if len(rs.tokenList) > 0 {
+			for _, t := range rs.tokenList {
+				if time.Now().After(t.expires) {
+					t.Valid = false
+				}
+			}
+		}
+		if time.Now().Local().Sub(rs.lastCleanTime) > 60*time.Minute {
+			rs.lastCleanTime = time.Now()
+			for uuid, t := range rs.tokenList {
+				if !t.Valid {
+					delete(rs.tokenList, uuid)
+				}
+			}
+		}
+		// rs.mutex.Unlock()
+		time.Sleep(10 * time.Second)
+	}
 }

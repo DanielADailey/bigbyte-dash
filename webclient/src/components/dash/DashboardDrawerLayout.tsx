@@ -15,7 +15,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import DashboardAppBar from './DashboardAppBar'
 import DashboardMainContentArea from './DashboardMainContentArea';
 import { useNavigate } from 'react-router';
-import { AuthContext } from '../services/auth-service';
+import { AuthContext } from '../../services/auth-service';
 
 const drawerWidth = 240;
 

@@ -1,7 +1,7 @@
 import { TableContainer, Table, TableCell, TableRow, TableHead, TableBody, Paper, Card, CardContent, Grid, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { experimentalStyled as styled } from '@mui/material/styles';
-import { Getter } from "src/components/services/api-service";
+import { Getter } from "../../../services/api-service";
 import { useNavigate } from "react-router";
 
 const Item = styled(Paper)(({ theme }) => ({

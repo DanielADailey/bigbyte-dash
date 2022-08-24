@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import SyncLoader from "react-spinners/SyncLoader";
-import { Getter } from "src/components/services/api-service";
+import { Getter } from "../../../services/api-service";
 
 export default function ExpandedGameView(props:any){
     const [loading, setLoading] = useState<boolean>(true)

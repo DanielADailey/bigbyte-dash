@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -16,7 +15,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func GenJWT(uname string) *http.Cookie {
+func GenTokenString(uname string) string {
 	// Declare the expiration time of the token
 	// here, we have kept it as 5 minutes
 	expirationTime := time.Now().Add(5 * time.Minute)
@@ -34,15 +33,7 @@ func GenJWT(uname string) *http.Cookie {
 	// Create the JWT string
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
-		// If there is an error in creating the JWT return an internal server error
-		return nil
+		return ""
 	}
-
-	// Finally, we set the client cookie for "token" as the JWT we just generated
-	// we also set an expiry time which is the same as the token itself
-	return &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
-		Expires: expirationTime,
-	}
+	return tokenString
 }

@@ -7,6 +7,7 @@ CREATE TABLE tasks (
   end_time BIGINT NOT NULL, 
   status INT NOT NULL, 
   group_id VARCHAR(255) NOT NULL DEFAULT '',
+  avatar_location VARCHAR(255) NOT NULL DEFAULT '',
   created_by VARCHAR(255) NOT NULL DEFAULT '',
   assigned_to VARCHAR(255) NOT NULL DEFAULT '',
   comments VARCHAR(255) NOT NULL DEFAULT '', 

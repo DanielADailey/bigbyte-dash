@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import Box from '@mui/material/Box'
 import { Button, Card, CardContent, TextField, Typography } from "@mui/material";
-import axios from 'axios'
-import { minWidth } from "@mui/system";
-import { AuthContext } from "../services/auth-service";
+import { AuthContext } from "../../services/auth-service";
 import SyncLoader from 'react-spinners/SyncLoader'
 import { useNavigate } from "react-router";
+import uuid from 'react-uuid'
 
 export default function Auth() {
     const [username, setUsername] = useState<string>("")
@@ -13,6 +12,7 @@ export default function Auth() {
     const [loading, setLoading] = useState<boolean>(false)
     const [values, setValues] = useState({})
     const [isRegister, setIsRegister] = useState<boolean>(false)
+    const [error, setError] = useState<string>("")
     let navigate = useNavigate()
 
     const auth = React.useContext(AuthContext);
@@ -27,9 +27,12 @@ export default function Auth() {
             })
             return
         }
-        auth.login(cp.uname, cp.pword, () => {
+        auth.login(cp.uname, cp.pword, (uid) => {
             setLoading(false);
-            navigate("/v1", { replace: true });
+            document.cookie = "token="+uid.token
+            if (uid.id != 0){
+                navigate("/v1", { replace: true });
+            }
         })
     }
 
@@ -64,18 +67,18 @@ export default function Auth() {
                                 !isRegister ?
                                     <div>
                                         <Typography variant="h3" style={{ fontFamily: 'Playfair-Display', color: 'white' }} sx={{ mb: 1 }}>Login</Typography>
-                                        <TextField sx={{ mb: 1 }} fullWidth label="username" id="fullWidth" onChange={(e) => { setUsername(e.target.value) }} />
-                                        <TextField sx={{ mb: 1 }} fullWidth label="password" id="fullWidth" onChange={(e) => { setPassword(e.target.value) }} type="password" autoComplete="current-password" />
+                                        <TextField sx={{ mb: 1 }} fullWidth label="username" onChange={(e) => { setUsername(e.target.value) }} />
+                                        <TextField sx={{ mb: 1 }} fullWidth label="password" onChange={(e) => { setPassword(e.target.value) }} type="password" autoComplete="current-password" />
                                         <Typography onClick={() => { handleRegister(true) }}>No account? Click here to register.</Typography>
                                     </div> :
                                     <div>
                                         <Typography variant="h3" style={{ fontFamily: 'Playfair-Display', color: 'white' }} sx={{ mb: 1 }}>Register</Typography>
-                                        <TextField sx={{ mb: 1 }} fullWidth label="username" id="fullWidth" onChange={handleChange("uname")} />
-                                        <TextField sx={{ mb: 1 }} fullWidth label="password" id="fullWidth" onChange={handleChange("pword")} type="password"/>
-                                        <TextField sx={{ mb: 1 }} fullWidth label="first name" id="fullWidth" onChange={handleChange("fname")} />
-                                        <TextField sx={{ mb: 1 }} fullWidth label="last name" id="fullWidth" onChange={handleChange("lname")} />
-                                        <TextField sx={{ mb: 1 }} fullWidth label="email" id="fullWidth" onChange={handleChange("email")} />
-                                        <TextField sx={{ mb: 1 }} fullWidth label="age" id="fullWidth" onChange={handleChange("age")} />
+                                        <TextField sx={{ mb: 1 }} fullWidth label="username"  onChange={handleChange("uname")} />
+                                        <TextField sx={{ mb: 1 }} fullWidth label="password"  onChange={handleChange("pword")} type="password"/>
+                                        <TextField sx={{ mb: 1 }} fullWidth label="first name" onChange={handleChange("fname")} />
+                                        <TextField sx={{ mb: 1 }} fullWidth label="last name" onChange={handleChange("lname")} />
+                                        <TextField sx={{ mb: 1 }} fullWidth label="email" onChange={handleChange("email")} />
+                                        <TextField sx={{ mb: 1 }} fullWidth label="age" onChange={handleChange("age")} />
                                         <Typography onClick={() => { handleRegister(false) }}>Already have an account? Click here to login.</Typography>
                                     </div>
                             }

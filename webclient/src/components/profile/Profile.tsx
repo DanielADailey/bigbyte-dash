@@ -1,8 +1,8 @@
 import { Toolbar, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import React, {useContext, useEffect, useState}from "react";
-import { AuthContext } from "../services/auth-service";
-import { Getter } from "../services/api-service";
+import { AuthContext } from "../../services/auth-service";
+import { Getter } from "../../services/api-service";
 
 export default function Profile(props:any) {
     const [loading, setLoading] = useState<boolean>(true)

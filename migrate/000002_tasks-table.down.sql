@@ -1,1 +1,1 @@
-DROP TABLE payouts
+DROP TABLE tasks

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ddailey/bigbyte-dash/db"
 	"github.com/ddailey/bigbyte-dash/server/auth"
@@ -42,31 +43,25 @@ type GameAddPacket struct {
 	Description string `json:"description"`
 }
 
+type TokenPacket struct {
+	Token   string `json:"token"`
+	ID      int    `json:"id"`
+	Valid   bool   `json:"valid"`
+	expires time.Time
+}
+
 func (rs *RestServer) authUser(w http.ResponseWriter, r *http.Request) {
-	pkt := &AuthPacket{}
-	if err := json.NewDecoder(r.Body).Decode(&pkt); err != nil {
-		w.Write([]byte("Error decoding post body"))
-		return
+	if r.Cookies()[0] != nil {
+		if rs.tokenList[r.Cookies()[0].Value].Valid {
+			buf, err := json.Marshal(rs.tokenList[r.Cookies()[0].Value])
+			if err == nil {
+				w.Write(buf)
+				return
+			}
+			w.Write([]byte("No valid cookie"))
+		}
 	}
-	fmt.Println(pkt)
-	hash, err := rs.getDbUserHash(pkt.Username)
-	if err != nil {
-		w.Write([]byte(err.Error()))
-		return
-	}
-	if !auth.CheckPasswordHash(pkt.Password, hash) {
-		w.Write([]byte("Hash check failure"))
-		return
-	}
-
-	atCookie := auth.GenJWT(pkt.Username)
-	if atCookie == nil {
-		return
-	}
-
-	http.SetCookie(w, atCookie)
-	w.WriteHeader(200)
-	w.Write([]byte("OK, cookie?"))
+	w.Write([]byte("no cookies"))
 }
 
 func (rs *RestServer) registerUser(w http.ResponseWriter, r *http.Request) {
@@ -214,4 +209,39 @@ func (rs RestServer) getUserById(w http.ResponseWriter, r *http.Request) {
 
 func (rs *RestServer) testEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
+}
+
+func (rs *RestServer) login(w http.ResponseWriter, r *http.Request) {
+	pkt := &AuthPacket{}
+	if err := json.NewDecoder(r.Body).Decode(&pkt); err != nil {
+		w.Write([]byte("Error decoding post body"))
+		return
+	}
+	fmt.Println(pkt)
+	hash, err := rs.getDbUserHash(pkt.Username)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	if !auth.CheckPasswordHash(pkt.Password, hash) {
+		w.Write([]byte("Hash check failure"))
+		return
+	}
+
+	user, err := rs.getDbUserByColumn("username", pkt.Username, false)
+	if err == nil {
+		tp := &TokenPacket{
+			Token:   auth.GenTokenString(pkt.Username),
+			ID:      int(user.ID),
+			Valid:   true,
+			expires: time.Now().Local().Add(time.Minute * 15),
+		}
+		rs.tokenList[tp.Token] = tp
+		buf, err := json.Marshal(tp)
+		if err == nil {
+			w.WriteHeader(200)
+			fmt.Println(tp)
+			w.Write([]byte(buf))
+		}
+	}
 }
