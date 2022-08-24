@@ -63,13 +63,12 @@ func (rs *RestServer) Token(base string, route func(r chi.Router)) {
 	rs.group(base, rs.basicAuth, route)
 }
 
-// BasicAuth implements a simple middleware handler for adding basic http auth to a route.
+// BasicAuth implements a simple middleware handler for adding basic token auth to a route.
 func (rs *RestServer) basicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Cookies() != nil {
 			if len(r.Cookies()) > 0 {
 				for _, c := range r.Cookies() {
-					fmt.Println(c)
 					if c.Name == "token" {
 						_, ok := rs.tokenList[c.Value]
 						if ok {

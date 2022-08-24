@@ -58,17 +58,6 @@ export default function AddTaskDialog(props){
                     <TextField sx={{ mb: 2 }} fullWidth label="Description" onChange={handleChange("description")}
                         multiline
                         rows={6} />
-                    {/* <Button onClick={handlePopoverOpen}><Typography>Start Date</Typography></Button>
-                    <Popover
-                        open={startOpen}
-                        onClose={handleClose}
-                        anchorEl={anchorEl}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                        }}>
-                        <Calendar onChange={onDateChange} value={value} />
-                    </Popover> */}
                     <FormControl fullWidth sx={{ mb: 2 }}>
                         <InputLabel id="demo-simple-select-label">Assign</InputLabel>
                         <Select

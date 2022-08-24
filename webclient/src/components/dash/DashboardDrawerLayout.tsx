@@ -27,6 +27,10 @@ export default function DashboardDrawerLayout() {
       nav_route: ""
     },
     {
+      human_readable: "Kanban Board",
+      nav_route: "kanban/"
+    },
+    {
       human_readable: "Profile",
       nav_route: "profile/"
     }
@@ -61,7 +65,7 @@ export default function DashboardDrawerLayout() {
         variant="permanent"
         anchor="left">
         <Toolbar/>
-        <Typography variant="h4" style={{ fontFamily: 'Montserrat', color: 'white' }} sx={{ mb: 1 }}>Gamertäg</Typography>
+        <Typography variant="h4" style={{ fontFamily: 'Montserrat', color: 'white' }} sx={{ mb: 1 }}>Tasked.</Typography>
         <Divider />
         <List>
           {DrawerRoutes.map((route, index) => (
