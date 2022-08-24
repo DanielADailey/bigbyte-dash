@@ -23,16 +23,8 @@ export default function DashboardDrawerLayout() {
 
   const DrawerRoutes = [
     {
-      human_readable: "Browse Games",
-      nav_route: ""
-    },
-    {
-      human_readable: "Add Game",
-      nav_route: "games/add"
-    },
-    {
       human_readable: "Tasks",
-      nav_route: "tasks/"
+      nav_route: ""
     },
     {
       human_readable: "Profile",

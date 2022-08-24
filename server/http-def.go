@@ -20,14 +20,15 @@ type RegistrationPacket struct {
 
 type TaskPacket struct {
 	Title           string   `json:"title"`
-	TaskDescription string   `json:"task_description"`
+	TaskDescription string   `json:"description"`
 	StartTime       int64    `json:"start_time"`
 	EndTime         int64    `json:"end_time"`
 	Status          int      `json:"status"`
 	GroupId         string   `json:"group_id"`
+	Priority        int      `json:"priority"`
 	CreatedBy       int      `json:"created_by"`
 	AssignedTo      int      `json:"assigned_to"`
-	Comments        []string `json:"offsets"`
+	Comments        []string `json:"comments"`
 }
 
 type TokenPacket struct {

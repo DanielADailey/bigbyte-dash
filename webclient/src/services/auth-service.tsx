@@ -2,8 +2,8 @@
  * This represents some generic auth provider API, like Firebase.
  */
  import axios from "axios";
-import React, { createContext, FC, useState } from "react";
-import { useNavigate } from "react-router";
+import React, { createContext, FC, useState, useEffect } from "react";
+import { useNavigate} from "react-router";
 
 const API_URL = "http://localhost:3001/login"
 const AUTH_URL = "http://localhost:3001/auth"
@@ -23,12 +23,16 @@ const REGISTER_URL = "http://localhost:3001/register"
   export function AuthProvider({children}: {children: React.ReactNode;}) {
     let [uid, setUid] = React.useState<number>(0);
     const nav = useNavigate()
+    useEffect(() => {
+      if (uid!=0){
+       nav("/v1")   
+      }
+  },[])
     if (uid == 0) {
       axios.get(AUTH_URL, {withCredentials: true}).then(res =>{
         console.log(res.data)
         if(res.data.id){
           setUid(res.data.id)
-          nav("/v1")
         }
       }).catch(err => {
         console.log(err)

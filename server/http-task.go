@@ -3,8 +3,10 @@ package server
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/ddailey/bigbyte-dash/db"
+	"github.com/go-chi/chi/v5"
 	"github.com/lib/pq"
 )
 
@@ -37,4 +39,21 @@ func (rs *RestServer) getTasks(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write(buf)
 	}
+}
+
+func (rs *RestServer) updateTaskStatus(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	status := chi.URLParam(r, "status")
+	sn, err := strconv.Atoi(status)
+	if err != nil {
+		return
+	}
+	task, err := rs.getDbTaskByColumn("id", id, false)
+	if err != nil {
+		return
+	}
+	if task != nil {
+		task.Status = sn
+	}
+	rs.saveTask(task)
 }

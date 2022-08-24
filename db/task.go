@@ -17,5 +17,5 @@ type Task struct {
 	CreatedBy       int            `gorm:"column:created_by"`
 	AssignedTo      int            `gorm:"column:assigned_to"`
 	GroupId         string         `gorm:"column:group_id"`
-	Comments        pq.StringArray `gorm:"column:offsets;type:string[]"`
+	Comments        pq.StringArray `gorm:"column:comments;type:string[]"`
 }

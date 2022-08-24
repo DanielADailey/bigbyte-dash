@@ -108,6 +108,39 @@ func (rs *RestServer) getDbUserByColumn(col, val string, delete bool) (*db.User,
 	return user, nil
 }
 
+func (rs *RestServer) getDbTaskByColumn(col, val string, delete bool) (*db.Task, error) {
+	gdb, err := rs.connect()
+	if err != nil {
+		fmt.Println("err connecting to db")
+	}
+	fmt.Println(col, val, delete)
+	var task *db.Task
+	gdb.First(&task, fmt.Sprintf("%s = ?", col), val)
+	if task.Title == "" {
+		fmt.Println(task)
+		return nil, fmt.Errorf("not found")
+	}
+	if delete {
+		gdb.Delete(&task)
+		return nil, nil
+	}
+	return task, nil
+}
+
+func (rs *RestServer) saveTask(task *db.Task) error {
+	db, err := rs.connect()
+	if err != nil {
+		fmt.Println("err connecting to db")
+	}
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		tx.Save(task)
+		return tx.Error
+	}); err != nil {
+		return fmt.Errorf("transaction error")
+	}
+	return nil
+}
+
 func (rs *RestServer) userExists(uname string) bool {
 	user, _ := rs.getDbUserByColumn("username", uname, false)
 	return user != nil

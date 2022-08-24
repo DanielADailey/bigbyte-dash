@@ -68,12 +68,16 @@ func (rs *RestServer) basicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Cookies() != nil {
 			if len(r.Cookies()) > 0 {
-				token := r.Cookies()[0].Value
-				_, ok := rs.tokenList[token]
-				if ok {
-					if rs.tokenList[token].Valid {
-						next.ServeHTTP(w, r)
-						return
+				for _, c := range r.Cookies() {
+					fmt.Println(c)
+					if c.Name == "token" {
+						_, ok := rs.tokenList[c.Value]
+						if ok {
+							if rs.tokenList[c.Value].Valid {
+								next.ServeHTTP(w, r)
+								return
+							}
+						}
 					}
 				}
 			}
@@ -104,12 +108,13 @@ func (rs *RestServer) Run() {
 		r.Get("/{id}", rs.getUserById)
 	})
 	rs.Public(AdminEndpoint, func(r chi.Router) {
+		r.Get("/", rs.getUsers)
 		r.Post("/{id}", rs.updateUser)
 		r.Delete("/{id}", rs.deleteUser)
-		r.Get("/", rs.getUsers)
 	})
 	rs.Token(TasksEndpoint, func(r chi.Router) {
 		r.Get("/", rs.getTasks)
+		r.Get("/{id}/{status}", rs.updateTaskStatus)
 		r.Post("/", rs.addTask)
 	})
 	rs.Public(RegisterEndpoint, func(r chi.Router) {
